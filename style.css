@@ -1,0 +1,45 @@
+:root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --accent: #38bdf8;
+    --success: #22c55e;
+    --gold: #fbbf24;
+    --text: #f8fafc;
+    --text-dim: #94a3b8;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
+.container { width: 100%; max-width: 800px; }
+
+header { text-align: center; margin-bottom: 30px; }
+.badge { background: #2563eb; padding: 2px 8px; border-radius: 4px; font-size: 0.9rem; }
+
+.card { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; }
+.input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
+
+label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-dim); margin-bottom: 8px; text-transform: uppercase; }
+.input-group { display: flex; background: #0f172a; border-radius: 10px; border: 1px solid #334155; overflow: hidden; }
+input { background: transparent; border: none; color: white; padding: 12px; width: 100%; outline: none; font-size: 1rem; }
+select, .unit-label { background: #334155; color: white; border: none; padding: 0 12px; font-weight: 600; display: flex; align-items: center; }
+
+.results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; }
+.res-card { background: var(--card); padding: 22px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.05); }
+
+.label { font-size: 0.7rem; color: var(--text-dim); font-weight: 800; text-transform: uppercase; }
+.main-val { font-size: 1.8rem; font-weight: 800; margin: 8px 0; }
+.main-val small { font-size: 0.8rem; opacity: 0.5; }
+.sub-val { font-size: 0.95rem; color: var(--text-dim); }
+
+.highlight { border-left: 4px solid var(--accent); }
+.success { border-left: 4px solid var(--success); }
+.success .main-val { color: var(--success); }
+.profit-tag { display: inline-block; background: rgba(34, 197, 94, 0.15); color: var(--success); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; }
+
+.team { background: linear-gradient(135deg, #1e3a8a, #1e293b); grid-column: 1 / -1; text-align: center; border: none; }
+.team .main-val { color: var(--gold); font-size: 2.5rem; }

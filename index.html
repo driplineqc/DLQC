@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drip Line Calcul</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Drip Line Calcul <span class="badge">QC</span></h1>
+        </header>
+
+        <section class="card inputs">
+            <div class="input-grid">
+                <div class="field">
+                    <label>Coût Article</label>
+                    <div class="input-group">
+                        <input type="number" id="buyPrice" value="100">
+                        <select id="buyCurrency">
+                            <option value="CNY">¥ CNY</option>
+                            <option value="USD">$ USD</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>Poids</label>
+                    <div class="input-group">
+                        <input type="number" id="weight" value="410">
+                        <select id="weightUnit">
+                            <option value="g">g</option>
+                            <option value="kg">kg</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="field">
+                    <label>USD → CAD</label>
+                    <div class="input-group">
+                        <input type="number" id="usdRate" value="1.38" step="0.001">
+                        <span class="unit-label">CAD</span>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>Profit : <span id="marginLabel">30</span>%</label>
+                    <input type="range" id="marginRange" min="0" max="100" value="30">
+                </div>
+            </div>
+        </section>
+
+<div class="results-grid">
+            <div class="res-card">
+                <span class="label">Livraison</span>
+                <div class="main-val"><span id="shipCad">0.00</span>$ <small>CAD</small></div>
+                <div class="sub-val"><span id="shipUsd">0.00</span>$ <small>USD</small></div>
+                <p class="detail" id="shipCalcDetails">Tranches de 500g + Frais fixes</p>
+            </div>
+
+            <div class="res-card highlight">
+                <span class="label">Coût Total</span>
+                <div class="main-val"><span id="totalCad">0.00</span>$ <small>CAD</small></div>
+                <div class="sub-val"><span id="totalUsd">0.00</span>$ <small>USD</small></div>
+            </div>
+
+            <div class="res-card success">
+                <span class="label">Prix Suggéré</span>
+                <div class="main-val"><span id="salePrice">0.00</span>$ <small>CAD</small></div>
+                <div class="profit-tag" id="profitTag">+0.00$ net</div>
+            </div>
+
+            <div class="res-card team">
+                <span class="label">Par Associé</span>
+                <div class="main-val"><span id="shareAmount">0.00</span>$</div>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
