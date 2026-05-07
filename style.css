@@ -5,8 +5,13 @@
     --border: #e5e5e5;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', sans-serif; background-color: var(--studio-bg); color: var(--studio-dark); line-height: 1.6; }
+* {
+    box-sizing: border-box; /* Empêche les éléments de déborder */
+    margin: 0;
+    padding: 0;
+}
+
+body { font-family: 'Inter', sans-serif; background-color: var(--studio-bg); color: var(--studio-dark); line-height: 1.6; overflow-x: hidden;}
 
 /* --- HEADER --- */
 .main-header {
@@ -15,10 +20,37 @@ body { font-family: 'Inter', sans-serif; background-color: var(--studio-bg); col
     text-align: center;
     position: relative;
 }
+
 @media (max-width: 600px) {
-    .modal-images-grid { grid-template-columns: 1fr; }
-    .modal-images-grid img { height: auto; /* Pleine hauteur sur mobile */ }
+    .main-logo {
+        font-size: 2.5rem;
+    }
+
+    .sub-nav ul {
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding: 10px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-item {
+        font-size: 0.8rem;
+        padding: 5px 10px;
+    }
+
+    .modal-content {
+        width: 98%;
+        margin: 10px auto;
+        padding: 15px;
+    }
+
+    .modal-images-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 5px;
+    }
 }
+
 .brand-desc { margin-top: 15px; font-size: 0.8rem; letter-spacing: 5px; text-transform: uppercase; color: #999; }
 .main-logo {
     font-size: 10rem; font-weight: 900; letter-spacing: -10px;
@@ -81,13 +113,11 @@ body { font-family: 'Inter', sans-serif; background-color: var(--studio-bg); col
 /*Albums*/
 .content-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 30px;
-    padding: 40px 5%;
-    max-width: 1400px;
-    margin: 0 auto;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+    gap: 10px;
+    padding: 10px;
+    width: 100%;
 }
-
 .album-card {
     background: #fff;
     border: 1px solid var(--border);
@@ -274,9 +304,6 @@ body { font-family: 'Inter', sans-serif; background-color: var(--studio-bg); col
     position: fixed; top: 20px; left: 20px; color: #888; text-decoration: none; 
     font-size: 0.8rem; font-weight: bold; z-index: 10;
 }
-
-/* --- RESPONSIVE --- */
-@media (max-width: 768px) { .main-logo { font-size: 4rem; letter-spacing: -3px; } .content-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); } }
 
 .inventory-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
 .btn-delete { background: #ff4444; color: white; border: none; padding: 5px 10px; cursor: pointer; }
