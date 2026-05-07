@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DLQC | Quality Check</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+<header class="main-header">
+    <div style="position: absolute; top: 20px; left: 5%;">
+        <a href="admin.html" style="text-decoration: none; color: #ccc; font-size: 0.7rem; font-weight: 800; letter-spacing: 1px;">
+            <i class="fas fa-user-shield"></i> ACCÈS AFFILIÉ
+        </a>
+    </div>
+    
+    <div class="brand-center">
+        <h1 class="main-logo">DLQC</h1>
+        <p class="brand-desc">Drip Line Quality Check</p>
+    </div>
+</header>
+<nav class="sub-nav">
+        <ul>
+            <li class="nav-item active" id="cat-all" onclick="filterCat('all')">Tous les Albums</li>
+            <li class="nav-item" id="cat-shoes" onclick="filterCat('shoes')">Chaussures</li>
+            <li class="nav-item" id="cat-clothes" onclick="filterCat('clothes')">Vêtements</li>
+            <li class="nav-item" id="cat-acc" onclick="filterCat('acc')">Accessoires</li>
+        </ul>
+    </nav>
+
+    <main class="content-grid" id="gallery"></main>
+
+    <section class="about-section">
+        <div class="about-container">
+            <h2 id="about-title">Inspection de Qualité</h2>
+            <p id="about-text">
+                Ici sont regroupées les photos des articles déjà vendus et reçus. 
+                Ce catalogue vous permet de vérifier la conformité et la qualité réelle de nos produits avant commande.
+            </p>
+        </div>
+    </section>
+
+<div id="album-modal" class="modal">
+<span class="close-modal" onclick="closeAlbum()">&times;</span>
+<div class="modal-content">
+        <h2 id="modal-title"></h2>
+        <p id="modal-desc" class="modal-desc"></p>
+        <div id="modal-images-list" class="modal-images-grid"></div>
+    </div>
+</div>
+
+    <footer class="footer-contacts">
+        <div class="social-links">
+            <a href="https://instagram.com/drip_line_supply" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a href="mailto:Drip.line.qc@gmail.com"><i class="far fa-envelope"></i></a>
+        </div>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
