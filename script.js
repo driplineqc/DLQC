@@ -40,10 +40,11 @@ async function checkAdmin() {
 function showAdminPanel() {
     const loginZone = document.getElementById('login-zone');
     const adminContent = document.getElementById('admin-content');
-    
+    const logoutBtn = document.getElementById('logout-btn');
+
     if (loginZone) loginZone.style.display = 'none';
     if (adminContent) adminContent.style.display = 'block';
-
+    if (logoutBtn) logoutBtn.style.display = 'flex';
 
     if (typeof loadAlbums === "function") {
         loadAlbums();
@@ -242,6 +243,17 @@ async function handlePublish() {
 async function deleteAlbum(id) {
     if (confirm("Supprimer définitivement cet album ?")) {
         await db.collection("albums").doc(id).delete();
+    }
+}
+
+async function logout() {
+    try {
+        await firebase.auth().signOut();
+        localStorage.removeItem('adminSession');
+        location.reload();
+    } catch (e) {
+        localStorage.removeItem('adminSession');
+        location.reload();
     }
 }
 
