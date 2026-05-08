@@ -335,25 +335,23 @@ body { font-family: 'Inter', sans-serif; background-color: var(--studio-bg); col
 }
 
 .floating-logout {
-position: fixed;
-    bottom: 20px;
-    left: 20px;
+    position: fixed !important;
+    bottom: 30px !important;
+    left: 20px !important;
+
+    pointer-events: auto !important;
+    touch-action: manipulation;
+    
     background-color: #ff5252;
     color: white;
     border: none;
-    padding: 12px 20px;
     border-radius: 50px;
-    font-weight: bold;
-    font-size: 14px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    cursor: pointer;
-    z-index: 1000;
+    padding: 15px 25px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    transition: transform 0.2s, background-color 0.2s;
+    justify-content: center;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
 }
-
 .floating-logout:hover {
     background-color: #ff1744;
     transform: scale(1.05);
