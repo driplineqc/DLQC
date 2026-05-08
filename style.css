@@ -334,7 +334,7 @@ body { font-family: 'Inter', sans-serif; background-color: var(--studio-bg); col
     gap: 15px;
 }
 
-.logout-panel {
+.floating-logout {
 position: fixed;
     bottom: 20px;
     left: 20px;
@@ -354,12 +354,12 @@ position: fixed;
     transition: transform 0.2s, background-color 0.2s;
 }
 
-.logout-panel:hover {
+.floating-logout:hover {
     background-color: #ff1744;
     transform: scale(1.05);
 }
 
-.logout-panel:active {
+.floating-logout:active {
     transform: scale(0.95);
 }
 
