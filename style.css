@@ -426,13 +426,12 @@ body { font-family: 'Inter', sans-serif; background-color: var(--studio-bg); col
     transform: translateY(-2px);
 }
 
-.inventory-scroll { max-height: 500px; overflow-y: auto; }
-
 .back-to-site {
     position: fixed; top: 20px; left: 20px; color: #888; text-decoration: none; 
     font-size: 0.8rem; font-weight: bold; z-index: 10;
 }
 
+.inventory-scroll { max-height: 500px; overflow-y: auto; }
 .inventory-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
 .btn-delete { background: #ff4444; color: white; border: none; padding: 5px 10px; cursor: pointer; }
 .nothing-msg { text-align: center; grid-column: 1 / -1; padding: 50px; color: #999; font-weight: bold; }
