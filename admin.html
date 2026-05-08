@@ -8,14 +8,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
+<button onclick="logout()" id="logout-btn" class="floating-logout">
+    <i class="fas fa-sign-out-alt"></i>
+    <span>Déconnexion</span>
+</button>
+
 <body class="admin-body">
 
     <a href="index.html" class="back-to-site">
         <i class="fas fa-arrow-left"></i> REVENIR AU SITE
     </a>
     
-    <button onclick="logout()" id="logout-btn" class="logout-panel" >Déconnexion</button>
-
     <div id="login-zone" class="login-overlay">
         <div class="login-card">
             <div class="input-group">
