@@ -13,6 +13,8 @@
     <a href="index.html" class="back-to-site">
         <i class="fas fa-arrow-left"></i> REVENIR AU SITE
     </a>
+    
+    <button onclick="logout()" id="logout-btn" class="logout-panel" >Déconnexion</button>
 
     <div id="login-zone" class="login-overlay">
         <div class="login-card">
@@ -25,7 +27,6 @@
     </div>
 
     <div id="admin-content" class="dashboard-container" style="display:none;">
-
         <div class="dashboard-grid">
             <div class="dashboard-card">
                 <div class="form-group">
@@ -68,5 +69,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="script.js"></script>
+
 </body>
 </html>
