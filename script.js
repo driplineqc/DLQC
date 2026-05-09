@@ -1,3 +1,10 @@
+const CONFIG = {
+    MAX_WIDTH: 1200,
+    QUALITY: 0.7,
+    MAX_PHOTOS: 4,
+    IMGBB_KEY: 'a80c5c589d5cee1d3589f36a1c9bcfea'
+};
+
 const firebaseConfig = {
   apiKey: "AIzaSyAbY3NTtzDjIlMKdS-NHZSlEVcf_oQPRQ0",
   authDomain: "dlqc-8866c.firebaseapp.com",
@@ -8,58 +15,61 @@ const firebaseConfig = {
   measurementId: "G-RP2K0F6E81"
 };
 
-const IMGBB_API_KEY = 'a80c5c589d5cee1d3589f36a1c9bcfea';
+const app = !firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
+const db = app.firestore();
+const auth = app.auth();
 
-const CONFIG = {
-    MAX_WIDTH: 1200,
-    QUALITY: 0.7,
-    MAX_PHOTOS: 4,
-    IMGBB_API: `https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`
-};
-
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-
-const db = firebase.firestore();
-const auth = firebase.auth();
 let currentFilter = 'all';
 
-async function checkAdmin() {
-    const email = "drip.line.qc@gmail.com"
-    const pass = document.getElementById('admin-pass').value;
-    
-    if(!pass) return alert("Veuillez entrer le code.");
-
-    try {
-        const userCredential = await firebase.auth().signInWithEmailAndPassword(email, pass);
-
-        const expirationDate = new Date().getTime() + (7 * 24 * 60 * 60 * 1000);
-        localStorage.setItem('adminSession', JSON.stringify({
-            token: "AUTHORIZED",
-            uid: userCredential.user.uid,
-            expires: expirationDate
-        }));
-
-        showAdminPanel();
+const StorageService = {
+    async upload(blob) {
+        const formData = new FormData();
+        formData.append("image", blob);
         
-    } catch (error) {
-        console.error(error);
-        alert("Accès refusé : Code invalide.");
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${CONFIG.IMGBB_KEY}`, {
+            method: "POST",
+            body: formData
+        });
+        
+        const result = await res.json();
+        if (!result.success) throw new Error(result.error?.message || "Erreur ImgBB");
+        return result.data.url;
+    }
+};
+
+const SessionManager = {
+    check() {
+        auth.onAuthStateChanged(user => {
+            UI.toggleAdminView(!!user);
+            if (user) loadAlbums();
+        });
+    },
+    logout() {
+        auth.signOut().then(() => location.reload());
+    }
+};
+
+const UI = {
+    toggleAdminView(isLogged) {
+        const views = {
+            'login-zone': isLogged ? 'none' : 'flex',
+            'admin-content': isLogged ? 'block' : 'none',
+            'logout-btn': isLogged ? 'flex' : 'none'
+        };
+        Object.entries(views).forEach(([id, display]) => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = display;
+        });
     }
 }
 
-function showAdminPanel() {
-    const loginZone = document.getElementById('login-zone');
-    const adminContent = document.getElementById('admin-content');
-    const logoutBtn = document.getElementById('logout-btn');
-
-    if (loginZone) loginZone.style.display = 'none';
-    if (adminContent) adminContent.style.display = 'block';
-    if (logoutBtn) logoutBtn.style.display = 'flex';
-
-    if (typeof loadAlbums === "function") {
-        loadAlbums();
+async function checkAdmin() {
+    const email = "drip.line.qc@gmail.com";
+    const pass = document.getElementById('admin-pass').value;
+    try {
+        await auth.signInWithEmailAndPassword(email, pass);
+    } catch (e) {
+        alert("Code invalide.");
     }
 }
 
@@ -73,18 +83,14 @@ async function compressImage(file) {
             img.onload = () => {
                 const canvas = document.createElement('canvas');
                 let { width, height } = img;
-
                 if (width > CONFIG.MAX_WIDTH) {
                     height = Math.round((height * CONFIG.MAX_WIDTH) / width);
                     width = CONFIG.MAX_WIDTH;
                 }
-
                 canvas.width = width;
                 canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-                
-                canvas.toBlob((blob) => resolve(blob), 'image/jpeg', CONFIG.QUALITY);
+                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                canvas.toBlob(blob => resolve(blob), 'image/jpeg', CONFIG.QUALITY);
             };
         };
         reader.onerror = reject;
@@ -113,19 +119,6 @@ function previewImages() {
             }
             reader.readAsDataURL(file);
         });
-    }
-}
-
-function checkSession() {
-    const sessionData = localStorage.getItem('adminSession');
-    if (sessionData) {
-        const session = JSON.parse(sessionData);
-        const now = new Date().getTime();
-        if (session.token === "AUTHORIZED" && now < session.expires) {
-            showAdminPanel();
-        } else {
-            localStorage.removeItem('adminSession');
-        }
     }
 }
 
@@ -258,18 +251,13 @@ const files = Array.from(ui.input.files);
     ui.btn.innerText = "Traitement...";
 
     try {
-        const snap = await db.collection("albums").where("name", "==", nameVal).limit(1).get();
-        if (!snap.empty) throw new Error("Cet article existe déjà.");
-
-        const uploadPromises = files.map(async (file) => {
-            const compressed = await compressImage(file);
-            return await uploadToImgBB(compressed);
-        });
-
-        const urls = await Promise.all(uploadPromises);
+        const urls = await Promise.all(files.map(async file => {
+            const blob = await compressImage(file);
+            return await StorageService.upload(blob);
+        }));
 
         await db.collection("albums").add({
-            name: nameVal,
+            name: ui.name.value.trim(),
             category: ui.cat.value,
             description: ui.desc.value,
             images: urls,
@@ -277,13 +265,10 @@ const files = Array.from(ui.input.files);
             date: new Date().toISOString()
         });
 
-        alert("Succès !");
         location.reload();
-
     } catch (err) {
-        alert(`Erreur : ${err.message}`);
+        alert(`Échec : ${err.message}`);
         ui.btn.disabled = false;
-        ui.btn.innerText = "PUBLIER SUR DLQC";
     }
 }
 
@@ -304,5 +289,7 @@ async function logout() {
     }
 }
 
-window.onload = loadAlbums;
-document.addEventListener('DOMContentLoaded', checkSession);
+document.addEventListener('DOMContentLoaded', () => {
+    SessionManager.check();
+    loadAlbums();
+});
