@@ -8,16 +8,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
-<button id="logout-btn" 
-    class="floating-logout" 
-    onclick="logout()" 
-    ontouchend="logout()"
-    class="floating-logout">
-    <i class="fas fa-sign-out-alt"></i>
-    <span>Déconnexion</span>
-</button>
-
 <body class="admin-body">
+    <button id="logout-btn" class="floating-logout" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Déconnexion</span>
+    </button>
 
     <a href="index.html" class="back-to-site">
         <i class="fas fa-arrow-left"></i> REVENIR AU SITE
@@ -40,29 +35,51 @@
                     <label>Nom de l'article</label>
                     <input type="text" id="album-name" placeholder="Ex: Jordan 4 Retro Black Cat">
                 </div>
+
                 <div class="form-group">
                     <label>Catégorie</label>
-                    <select id="album-category">
-                        <option value="shoes">Chaussures</option>
-                        <option value="clothes">Vêtements</option>
-                        <option value="acc">Accessoires</option>
-                    </select>
+                    <div class="category-selector">
+                        <input type="radio" id="cat-shoes" name="category" value="shoes" checked>
+                        <label for="cat-shoes">Chaussures</label>
+                        
+                        <input type="radio" id="cat-clothes" name="category" value="clothes">
+                        <label for="cat-clothes">Vêtements</label>
+                        
+                        <input type="radio" id="cat-acc" name="category" value="acc">
+                        <label for="cat-acc">Accessoires</label>
+                    </div>
+
+                    <div class="form-group">
+                    <label>Qualité</label>
+                    <div class="quality-selector">
+                        <input type="checkbox" id="q-medium" value="Medium">
+                        <label for="q-medium">Medium</label>
+                        
+                        <input type="checkbox" id="q-superior" value="Supérieur">
+                        <label for="q-superior">Supérieur</label>
+                    </div>
                 </div>
+
+                 <div class="form-group">
+                    <label>Couleurs (séparées par une virgule)</label>
+                    <input type="text" id="album-colors" placeholder="Rouge, Marron...">
+                </div>
+
                 <div class="form-group">
-                    <label>Description & Détails </label>
-                    <textarea id="album-desc" rows="4" placeholder="Matériaux,Taille,Couleur"></textarea>
+                    <label>Description (Autres détails)</label>
+                    <textarea id="album-desc" rows="3" placeholder="Informations complémentaires..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="file-label">
+                        <i class="fas fa-cloud-upload-alt"></i> Sélectionner les photos
+                        <input type="file" id="photo-input" multiple accept="image/*" onchange="previewImages()">
+                    </label>
                 </div>
                 
-                <div class="form-group">
-    <label class="file-label">
-        <i class="fas fa-cloud-upload-alt"></i> Sélectionner les photos
-        <input type="file" id="photo-input" multiple accept="image/*" onchange="previewImages()">
-    </label>
-</div>
-<div id="publish-preview-zone" class="preview-grid" style="margin-bottom: 20px;">
-</div>
-
-<button onclick="handlePublish()" id="publish-btn" class="btn-publish-final">PUBLIER SUR DLQC</button>
+                <div id="publish-preview-zone" class="preview-grid" style="margin-bottom: 20px;"></div>
+                
+                <button onclick="handlePublish()" id="publish-btn" class="btn-publish-final">PUBLIER SUR DLQC</button>
 
             <div class="dashboard-card">
                 <h3><i class="fas fa-boxes"></i> En ligne</h3>
