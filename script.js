@@ -73,21 +73,6 @@ async function checkAdmin() {
     }
 }
 
-const getBadgeStyle = (value) => {
-    const val = value.trim().toLowerCase();
-
-
-    const grayTerms = ['medium', 'supérieur', 'superieur'];
-    if (grayTerms.includes(val)) return 'background: #444; color: #eee;';
-
-    const s = new Option().style;
-    s.color = val;
-
-    return s.color !== '' 
-        ? `background: ${val}; color: ${isDarkColor(val) ? 'white' : 'black'}; border: none;`
-        : 'background: #444; color: #eee;';
-};
-
 const isDarkColor = (color) => {
     if (['black', 'noir', 'navy', 'purple'].includes(color.toLowerCase())) return true;
     return false;
@@ -230,38 +215,83 @@ function loadAlbums() {
     });
 }
 
+const renderBadge = (text, style) => {
+    return `<span class="badge" style="${style}">${text.trim()}</span>`;
+};
+
+const BadgeProcessor = {
+    generateAll(album) {
+        let html = '';
+    
+
+        (album.quality || []).forEach(q => {
+            html += renderBadge(q, ColorManager.getStyle(q));
+        });
+        
+        if (album.colors) {
+            album.colors.split(',').forEach(c => {
+                const style = ColorManager.getStyle(c);
+                html += renderBadge(c, style);
+            });
+        }
+        return html;
+    }
+};
+
+const ColorManager = {
+    translations: {
+        'noir': 'black', 'blanc': 'white', 'rouge': 'red', 'bleu': 'blue',
+        'vert': 'green', 'jaune': 'yellow', 'rose': 'pink', 'marron': 'brown',
+        'gris': 'gray', 'violet': 'purple', 'orange': 'orange'
+    },
+
+    getStyle(value) {
+        const val = value.trim().toLowerCase();
+    
+
+        if (['medium', 'supérieur', 'superieur'].includes(val)) {
+            return 'background-color: #444; color: #eee;';
+        }
+
+        const color = this.translations[val] || val;
+
+        const lightColors = ['white', 'blanc', 'yellow', 'jaune', 'pink', 'rose'];
+        const textColor = lightColors.includes(val) ? '#111' : '#fff';
+
+        return `background-color: ${color}; color: ${textColor}; border: none;`;
+    }
+};
+
 async function openAlbum(id) {
     const doc = await db.collection("albums").doc(id).get();
+    if (!doc.exists) return;
     const a = doc.data();
+    
+    const ui = {
+        title: document.getElementById('modal-title'),
+        desc: document.getElementById('modal-desc'),
+        badges: document.getElementById('modal-badges'),
+        images: document.getElementById('modal-images-list'),
+        modal: document.getElementById('album-modal')
+    };
 
-    document.getElementById('modal-title').textContent = a.name;
-    document.getElementById('modal-desc').textContent = a.description || "Aucun détail additionnel.";
+    const allData = [...(a.quality || []), ...(a.colors ? a.colors.split(',') : [])];
+    
+    ui.badges.innerHTML = allData.map(item => {
+        const label = item.trim();
+        return `<span class="badge" style="${ColorManager.getStyle(label)}">${label}</span>`;
+    }).join('');
 
-    const badgeContainer = document.getElementById('modal-badges');
-    badgeContainer.innerHTML = '';
+    ui.title.textContent = a.name;
+    ui.desc.textContent = a.description || "Aucun détail additionnel.";
 
-(a.quality || []).forEach(q => {
-    badgeContainer.innerHTML += `<span class="badge" style="${getBadgeStyle(q)}">${q}</span>`;
-});
-
-if (a.colors) {
-    a.colors.split(',').forEach(c => {
-        const colorName = c.trim();
-        const translation = { 'noir': 'black', 'rouge': 'red', 'bleu': 'blue', 'vert': 'green' };
-        const cssColor = translation[colorName.toLowerCase()] || colorName;
-        
-        badgeContainer.innerHTML += `<span class="badge" style="${getBadgeStyle(cssColor)}">${colorName}</span>`;
-    });
-}
-
-    const container = document.getElementById('modal-images-list');
-    container.innerHTML = a.images.map(imgUrl => `
+    ui.images.innerHTML = (a.images || []).map(imgUrl => `
         <div class="zoom-img-container">
             <img src="${imgUrl}" alt="QC Detail" loading="lazy" onclick="window.open('${imgUrl}', '_blank')">
         </div>
     `).join('');
 
-    document.getElementById('album-modal').style.display = "block";
+    ui.modal.style.display = "block";
     document.body.style.overflow = "hidden";
 }
 
