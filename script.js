@@ -73,6 +73,26 @@ async function checkAdmin() {
     }
 }
 
+const getBadgeStyle = (value) => {
+    const val = value.trim().toLowerCase();
+
+
+    const grayTerms = ['medium', 'supérieur', 'superieur'];
+    if (grayTerms.includes(val)) return 'background: #444; color: #eee;';
+
+    const s = new Option().style;
+    s.color = val;
+
+    return s.color !== '' 
+        ? `background: ${val}; color: ${isDarkColor(val) ? 'white' : 'black'}; border: none;`
+        : 'background: #444; color: #eee;';
+};
+
+const isDarkColor = (color) => {
+    if (['black', 'noir', 'navy', 'purple'].includes(color.toLowerCase())) return true;
+    return false;
+};
+
 async function compressImage(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -214,13 +234,30 @@ async function openAlbum(id) {
     const doc = await db.collection("albums").doc(id).get();
     const a = doc.data();
 
-    document.getElementById('modal-title').innerHTML = `<div class="modal-title-header"><h2>${a.name}</h2></div>`;
-    document.getElementById('modal-desc').innerText = a.description || "Aucun détail additionnel pour cet article.";
+    document.getElementById('modal-title').textContent = a.name;
+    document.getElementById('modal-desc').textContent = a.description || "Aucun détail additionnel.";
+
+    const badgeContainer = document.getElementById('modal-badges');
+    badgeContainer.innerHTML = '';
+
+(a.quality || []).forEach(q => {
+    badgeContainer.innerHTML += `<span class="badge" style="${getBadgeStyle(q)}">${q}</span>`;
+});
+
+if (a.colors) {
+    a.colors.split(',').forEach(c => {
+        const colorName = c.trim();
+        const translation = { 'noir': 'black', 'rouge': 'red', 'bleu': 'blue', 'vert': 'green' };
+        const cssColor = translation[colorName.toLowerCase()] || colorName;
+        
+        badgeContainer.innerHTML += `<span class="badge" style="${getBadgeStyle(cssColor)}">${colorName}</span>`;
+    });
+}
 
     const container = document.getElementById('modal-images-list');
     container.innerHTML = a.images.map(imgUrl => `
         <div class="zoom-img-container">
-            <img src="${imgUrl}" alt="QC Detail" onclick="window.open('${imgUrl}', '_blank')">
+            <img src="${imgUrl}" alt="QC Detail" loading="lazy" onclick="window.open('${imgUrl}', '_blank')">
         </div>
     `).join('');
 
@@ -234,15 +271,18 @@ function closeAlbum() {
 }
 
 async function handlePublish() {
-const ui = {
+    
+    const ui = {
         name: document.getElementById('album-name'),
-        cat: document.getElementById('album-category'),
+        cat: document.querySelector('input[name="category"]:checked'),
         desc: document.getElementById('album-desc'),
+        colors: document.getElementById('album-colors'),
+        qualities: Array.from(document.querySelectorAll('.quality-selector input:checked')).map(el => el.value),
         input: document.getElementById('photo-input'),
         btn: document.getElementById('publish-btn')
     };
-
-const files = Array.from(ui.input.files);
+    
+    const files = Array.from(ui.input.files);
     const nameVal = ui.name.value.trim();
 
     if (!nameVal || files.length === 0) return alert("Données manquantes.");
@@ -257,8 +297,10 @@ const files = Array.from(ui.input.files);
         }));
 
         await db.collection("albums").add({
-            name: ui.name.value.trim(),
+            name: nameVal,
             category: ui.cat.value,
+            quality: ui.qualities,
+            colors: ui.colors.value.trim(),
             description: ui.desc.value,
             images: urls,
             cover: urls[0],
