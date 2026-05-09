@@ -8,13 +8,25 @@ const firebaseConfig = {
   measurementId: "G-RP2K0F6E81"
 };
 
-firebase.initializeApp(firebaseConfig);
+const IMGBB_API_KEY = 'a80c5c589d5cee1d3589f36a1c9bcfea';
+
+const CONFIG = {
+    MAX_WIDTH: 1200,
+    QUALITY: 0.7,
+    MAX_PHOTOS: 4,
+    IMGBB_API: `https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`
+};
+
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+
 const db = firebase.firestore();
-const IMGBB_API_KEY = 'a6fb312de00137611e8f3eb76a5fb7d4';
+const auth = firebase.auth();
 let currentFilter = 'all';
 
 async function checkAdmin() {
-    const email = "drip.line.qc@gmail.com";
+    const email = "drip.line.qc@gmail.com"
     const pass = document.getElementById('admin-pass').value;
     
     if(!pass) return alert("Veuillez entrer le code.");
@@ -49,6 +61,34 @@ function showAdminPanel() {
     if (typeof loadAlbums === "function") {
         loadAlbums();
     }
+}
+
+async function compressImage(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let { width, height } = img;
+
+                if (width > CONFIG.MAX_WIDTH) {
+                    height = Math.round((height * CONFIG.MAX_WIDTH) / width);
+                    width = CONFIG.MAX_WIDTH;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                canvas.toBlob((blob) => resolve(blob), 'image/jpeg', CONFIG.QUALITY);
+            };
+        };
+        reader.onerror = reject;
+    });
 }
 
 function previewImages() {
@@ -86,6 +126,26 @@ function checkSession() {
         } else {
             localStorage.removeItem('adminSession');
         }
+    }
+}
+
+async function uploadToImgBB(file) {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+        const response = await fetch(`${CONFIG.IMGBB_API}`, {
+            method: "POST",
+            body: formData
+        });
+        
+        const result = await response.json();
+        if (!result.success) throw new Error(result.error?.message || "Erreur ImgBB");
+        
+        return result.data.url;
+    } catch (error) {
+        console.error("Échec de l'upload:", error);
+        throw error;
     }
 }
 
@@ -181,62 +241,49 @@ function closeAlbum() {
 }
 
 async function handlePublish() {
-    const name = document.getElementById('album-name').value;
-    const cat = document.getElementById('album-category').value;
-    const desc = document.getElementById('album-desc').value;
-    const fileInput = document.getElementById('photo-input');
-    const files = document.getElementById('photo-input').files;
-    const btn = document.getElementById('publish-btn');
+const ui = {
+        name: document.getElementById('album-name'),
+        cat: document.getElementById('album-category'),
+        desc: document.getElementById('album-desc'),
+        input: document.getElementById('photo-input'),
+        btn: document.getElementById('publish-btn')
+    };
 
-    if (!name || files.length === 0) return alert("Minimum 1 photo");
+const files = Array.from(ui.input.files);
+    const nameVal = ui.name.value.trim();
+
+    if (!nameVal || files.length === 0) return alert("Données manquantes.");
     
-    if (files.length > 4) {
-        alert("maximum 4 photos.");
-        return;
-    }
-    const check = await db.collection("albums").where("name", "==", name).get();
-    if (!check.empty) return alert("Un album porte déjà ce nom !");
-
-    btn.innerText = "Upload en cours (0/" + files.length + ")...";
-    btn.disabled = true;
+    ui.btn.disabled = true;
+    ui.btn.innerText = "Traitement...";
 
     try {
-        let allImageUrls = [];
+        const snap = await db.collection("albums").where("name", "==", nameVal).limit(1).get();
+        if (!snap.empty) throw new Error("Cet article existe déjà.");
 
-        for (let i = 0; i < files.length; i++) {
-            btn.innerText = `Upload : ${i + 1}/${files.length}...`;
-            
-            let formData = new FormData();
-            formData.append("image", files[i]);
+        const uploadPromises = files.map(async (file) => {
+            const compressed = await compressImage(file);
+            return await uploadToImgBB(compressed);
+        });
 
-            let response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-                method: "POST",
-                body: formData
-            });
-
-            let result = await response.json();
-            if (result.success) {
-                allImageUrls.push(result.data.url);
-            }
-        }
+        const urls = await Promise.all(uploadPromises);
 
         await db.collection("albums").add({
-            name: name,
-            category: cat,
-            description: desc,
-            images: allImageUrls,
-            cover: allImageUrls[0],
+            name: nameVal,
+            category: ui.cat.value,
+            description: ui.desc.value,
+            images: urls,
+            cover: urls[0],
             date: new Date().toISOString()
         });
 
-        alert("Succès ! Votre Nike Tech est en ligne avec " + allImageUrls.length + " photos.");
+        alert("Succès !");
         location.reload();
 
-    } catch (error) {
-        console.error(error);
-        alert("Erreur lors de l'upload. Vérifiez votre connexion.");
-        btn.innerText = "PUBLIER SUR DLQC";
-        btn.disabled = false;
+    } catch (err) {
+        alert(`Erreur : ${err.message}`);
+        ui.btn.disabled = false;
+        ui.btn.innerText = "PUBLIER SUR DLQC";
     }
 }
 
