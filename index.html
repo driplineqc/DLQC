@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
-<body>
+<body>  
 
 <header class="main-header">
     <div style="position: absolute; top: 20px; left: 5%;">
@@ -23,14 +23,20 @@
         <p class="brand-desc">Drip Line Quality Check</p>
     </div>
 </header>
+
 <nav class="sub-nav">
-        <ul>
-            <li class="nav-item active" id="cat-all" onclick="filterCat('all')">Tous les Albums</li>
-            <li class="nav-item" id="cat-shoes" onclick="filterCat('shoes')">Chaussures</li>
-            <li class="nav-item" id="cat-clothes" onclick="filterCat('clothes')">Vêtements</li>
-            <li class="nav-item" id="cat-acc" onclick="filterCat('acc')">Accessoires</li>
-        </ul>
-    </nav>
+    <ul>
+        <li id="cat-all" class="nav-item active" onclick="filterCat('all')">TOUT</li>
+        <li id="cat-shoes" class="nav-item" onclick="filterCat('shoes')">SNEAKERS</li>
+        <li id="cat-clothes" class="nav-item" onclick="filterCat('clothes')">VÊTEMENTS</li>
+        <li id="cat-acc" class="nav-item" onclick="filterCat('acc')">ACCESSOIRES</li>
+    </ul>
+
+    <div class="search-container">
+        <i class="fas fa-search search-icon" aria-hidden="true"></i>
+        <input type="search" id="search-bar" placeholder="Rechercher une paire, une marque, un modèle..." aria-label="Rechercher">
+    </div>
+</nav>
 
     <main class="content-grid" id="gallery"></main>
 
@@ -51,7 +57,7 @@
     </footer>
     
 <div id="album-modal" class="modal">
-<span class="close-modal" onclick="closeAlbum()">&times;</span>
+<span class="close-modal" onclick="navigateToAlbum(null)">&times;</span>
 
 <div class="modal-content">
     <h2 id="modal-title"></h2>

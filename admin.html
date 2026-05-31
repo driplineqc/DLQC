@@ -9,35 +9,40 @@
 </head>
 
 <body class="admin-body">
-    <button id="logout-btn" class="floating-logout" onclick="logout()">
-        <i class="fas fa-sign-out-alt"></i>
+
+    <button id="logout-btn" class="floating-logout" onclick="logout()" style="display:none;">
+        <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
         <span>Déconnexion</span>
     </button>
 
     <a href="index.html" class="back-to-site">
-        <i class="fas fa-arrow-left"></i> REVENIR AU SITE
+        <i class="fas fa-arrow-left" aria-hidden="true"></i> REVENIR AU SITE
     </a>
 
-    <div id="login-zone" class="login-overlay">
-        <div class="login-card">
-            <div class="input-group">
-                <i class="fas fa-lock"></i>
-                <input type="password" id="admin-pass" placeholder="Entrez le code secret...">
-            </div>
-            <button onclick="checkAdmin()" class="btn-primary">DÉVERROUILLER L'ACCÈS</button>
+<section id="login-zone" class="login-overlay">
+    <form class="login-card" onsubmit="event.preventDefault(); checkAdmin();">
+        <div class="input-group">
+            <i class="fas fa-lock" aria-hidden="true"></i>
+            <input type="password" id="admin-pass" placeholder="Entrez le code secret..." aria-label="Code secret admin" required>
         </div>
-    </div>
+        <button type="submit" class="btn-primary">DÉVERROUILLER L'ACCÈS</button>
+    </form>
+</section>
 
-    <div id="admin-content" class="dashboard-container" style="display:none;">
+    <main id="admin-content" class="dashboard-container" style="display:none;">
         <div class="dashboard-grid">
-            <div class="dashboard-card">
+        
+
+            <form id="publish-form" class="dashboard-card" onsubmit="event.preventDefault(); handlePublish();">
+                <h2><i class="fas fa-plus-circle" aria-hidden="true"></i> Publier un article</h2>
+
                 <div class="form-group">
-                    <label>Nom de l'article</label>
-                    <input type="text" id="album-name" placeholder="Ex: Jordan 4 Retro Black Cat">
+                    <label for="album-name">Nom de l'article</label>
+                    <input type="text" id="album-name" placeholder="Ex: Jordan 4 Retro Black Cat" required>
                 </div>
 
                 <div class="form-group">
-                    <label>Catégorie</label>
+                    <span class="label-emulated">Catégorie</span>
                     <div class="category-selector">
                         <input type="radio" id="cat-shoes" name="category" value="shoes" checked>
                         <label for="cat-shoes">Chaussures</label>
@@ -48,9 +53,10 @@
                         <input type="radio" id="cat-acc" name="category" value="acc">
                         <label for="cat-acc">Accessoires</label>
                     </div>
+                </div>
 
-                    <div class="form-group">
-                    <label>Qualité</label>
+                <div class="form-group">
+                    <span class="label-emulated">Qualité</span>
                     <div class="quality-selector">
                         <input type="checkbox" id="q-medium" value="Medium">
                         <label for="q-medium">Medium</label>
@@ -60,34 +66,47 @@
                     </div>
                 </div>
 
-                 <div class="form-group">
-                    <label>Couleurs (séparées par une virgule)</label>
+                <div class="form-group">
+                    <label for="album-colors">Couleurs (séparées par une virgule)</label>
                     <input type="text" id="album-colors" placeholder="Rouge, Marron...">
                 </div>
 
                 <div class="form-group">
-                    <label>Description (Autres détails)</label>
+                    <label for="album-desc">Description (Autres détails)</label>
                     <textarea id="album-desc" rows="3" placeholder="Informations complémentaires..."></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label class="file-label">
-                        <i class="fas fa-cloud-upload-alt"></i> Sélectionner les photos
-                        <input type="file" id="photo-input" multiple accept="image/*" onchange="previewImages()">
-                    </label>
-                </div>
-                
-                <div id="publish-preview-zone" class="preview-grid" style="margin-bottom: 20px;"></div>
-                
-                <button onclick="handlePublish()" id="publish-btn" class="btn-publish-final">PUBLIER SUR DLQC</button>
-
-            <div class="dashboard-card">
-                <h3><i class="fas fa-boxes"></i> En ligne</h3>
-                <div id="admin-inventory-list" class="inventory-scroll">
-                    </div>
-            </div>
-        </div>
+    <span class="label-emulated">Amélioration d'image</span>
+    <div class="enhancer-toggle-container">
+        <label class="switch-label" for="enhance-toggle">
+            <input type="checkbox" id="enhance-toggle" checked>
+            <span class="slider"></span>
+        </label>
+        <span class="switch-text">Activer le filtre de netteté pure (Sharpen)</span>
     </div>
+</div>
+
+               <div class="form-group">
+    <label class="file-label" for="photo-input">
+        <i class="fas fa-cloud-upload-alt" aria-hidden="true"></i> Sélectionner les photos
+        <input type="file" id="photo-input" multiple accept="image/*">
+    </label>
+</div>
+                
+                <div id="publish-preview-zone" class="preview-grid" aria-live="polite"></div>
+                
+                <button type="button" onclick="handlePublish()" id="publish-btn" class="btn-publish-final">PUBLIER SUR DLQC</button>
+            </form>
+
+            <section class="dashboard-card">
+                <h3><i class="fas fa-boxes" aria-hidden="true"></i> En ligne</h3>
+                <div id="admin-inventory-list" class="inventory-scroll" aria-live="polite">
+                </div>
+            </section>
+
+        </div>
+    </main>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
